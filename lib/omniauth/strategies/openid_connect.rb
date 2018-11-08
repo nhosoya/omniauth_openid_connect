@@ -125,7 +125,7 @@ module OmniAuth
       def end_session_uri
         return unless end_session_endpoint_is_valid?
         end_session_uri = URI(client_options.end_session_endpoint)
-        end_session_uri.query = encoded_post_logout_redirect_uri
+        end_session_uri.query = end_session_query
         end_session_uri.to_s
       end
 
@@ -258,10 +258,11 @@ module OmniAuth
         "#{ client_options.redirect_uri }?redirect_uri=#{ CGI.escape(request.params['redirect_uri']) }"
       end
 
-      def encoded_post_logout_redirect_uri
+      def end_session_query
         return unless options.post_logout_redirect_uri
         URI.encode_www_form(
-          post_logout_redirect_uri: options.post_logout_redirect_uri
+          post_logout_redirect_uri: options.post_logout_redirect_uri,
+          client_id: client_options.identifier
         )
       end
 
