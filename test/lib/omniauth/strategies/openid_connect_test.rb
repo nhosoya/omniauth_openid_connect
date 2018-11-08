@@ -33,6 +33,7 @@ module OmniAuth
         config.stubs(:userinfo_endpoint).returns('https://example.com/userinfo')
         config.stubs(:jwks_uri).returns('https://example.com/jwks')
         config.stubs(:end_session_endpoint).returns('https://example.com/logout')
+        config.stubs(:user_registration_endpoint).returns(nil)
         ::OpenIDConnect::Discovery::Provider::Config.stubs(:discover!).with('https://example.com/').returns(config)
 
         request.stubs(:path_info).returns('/auth/openidconnect/logout')
@@ -42,7 +43,7 @@ module OmniAuth
       end
 
       def test_logout_phase_with_discovery_and_post_logout_redirect_uri
-        expected_redirect = 'https://example.com/logout?post_logout_redirect_uri=https%3A%2F%2Fmysite.com'
+        expected_redirect = 'https://example.com/logout?post_logout_redirect_uri=https%3A%2F%2Fmysite.com&client_id=1234'
         strategy.options.client_options.host = 'example.com'
         strategy.options.discovery = true
         strategy.options.post_logout_redirect_uri = 'https://mysite.com'
@@ -57,6 +58,7 @@ module OmniAuth
         config.stubs(:userinfo_endpoint).returns('https://example.com/userinfo')
         config.stubs(:jwks_uri).returns('https://example.com/jwks')
         config.stubs(:end_session_endpoint).returns('https://example.com/logout')
+        config.stubs(:user_registration_endpoint).returns(nil)
         ::OpenIDConnect::Discovery::Provider::Config.stubs(:discover!).with('https://example.com/').returns(config)
 
         request.stubs(:path_info).returns('/auth/openidconnect/logout')
@@ -100,6 +102,7 @@ module OmniAuth
         config.stubs(:userinfo_endpoint).returns('https://example.com/userinfo')
         config.stubs(:jwks_uri).returns('https://example.com/jwks')
         config.stubs(:end_session_endpoint).returns(nil)
+        config.stubs(:user_registration_endpoint).returns(nil)
         ::OpenIDConnect::Discovery::Provider::Config.stubs(:discover!).with('https://example.com/').returns(config)
 
         strategy.expects(:redirect).with(regexp_matches(expected_redirect))
@@ -168,6 +171,7 @@ module OmniAuth
         config.stubs(:userinfo_endpoint).returns('https://example.com/userinfo')
         config.stubs(:jwks_uri).returns('https://example.com/jwks')
         config.stubs(:end_session_endpoint).returns(nil)
+        config.stubs(:user_registration_endpoint).returns(nil)
         config.stubs(:jwks).returns(jwks)
 
         ::OpenIDConnect::Discovery::Provider::Config.stubs(:discover!).with('https://example.com/').returns(config)
