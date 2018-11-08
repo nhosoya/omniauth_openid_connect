@@ -21,7 +21,8 @@ module OmniAuth
         token_endpoint: '/token',
         userinfo_endpoint: '/userinfo',
         jwks_uri: '/jwk',
-        end_session_endpoint: nil
+        end_session_endpoint: nil,
+        user_registration_endpoint: nil
       }
       option :issuer
       option :discovery, false
@@ -115,6 +116,12 @@ module OmniAuth
           discover!
           return redirect(end_session_uri) if end_session_uri
         end
+
+        if user_registration_path_pattern.match(current_path)
+          discover!
+          return redirect(user_registration_uri) if user_registration_uri
+        end
+
         call_app!
       end
 
@@ -127,6 +134,13 @@ module OmniAuth
         end_session_uri = URI(client_options.end_session_endpoint)
         end_session_uri.query = end_session_query
         end_session_uri.to_s
+      end
+
+      def user_registration_uri
+        return unless user_registration_endpoint_is_valid?
+        user_registration_uri = URI(client_options.user_registration_endpoint)
+        user_registration_uri.query = user_registration_query
+        user_registration_uri.to_s
       end
 
       def authorize_uri
@@ -170,6 +184,7 @@ module OmniAuth
         client_options.userinfo_endpoint = discover.userinfo_endpoint
         client_options.jwks_uri = discover.jwks_uri
         client_options.end_session_endpoint = discover.end_session_endpoint
+        client_options.user_registration_endpoint = discover.user_registration_end_point
       end
 
       def user_info
@@ -266,13 +281,32 @@ module OmniAuth
         )
       end
 
+      def user_registration_query
+        URI.encode_www_form(
+          client_id: client_options.identifier,
+          response_type: options.response_type,
+          scope: options.scope.join(' '),
+          state: new_state,
+          redirect_uri: client_options.redirect_uri
+        )
+      end
+
       def end_session_endpoint_is_valid?
         client_options.end_session_endpoint &&
           client_options.end_session_endpoint =~ URI::DEFAULT_PARSER.make_regexp
       end
 
+      def user_registration_endpoint_is_valid?
+        client_options.user_registration_endpoint &&
+          client_options.user_registration_endpoint =~ URI::DEFAULT_PARSER.make_regexp
+      end
+
       def logout_path_pattern
         %r{\A#{Regexp.quote(request_path)}(/logout)}
+      end
+
+      def user_registration_path_pattern
+        %r{\A#{Regexp.quote(request_path)}(/register)}
       end
 
       class CallbackError < StandardError
