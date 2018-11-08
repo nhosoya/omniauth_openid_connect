@@ -184,7 +184,7 @@ module OmniAuth
         client_options.userinfo_endpoint = discover.userinfo_endpoint
         client_options.jwks_uri = discover.jwks_uri
         client_options.end_session_endpoint = discover.end_session_endpoint
-        client_options.user_registration_endpoint = discover.user_registration_end_point
+        client_options.user_registration_endpoint = discover.user_registration_endpoint
       end
 
       def user_info
